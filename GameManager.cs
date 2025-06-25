@@ -7,7 +7,6 @@ public class GameManager : MonoBehaviour
     public UIManager uiManager;
     public LogicManager logicManager;
     public NetworkManager networkManager;
-    public RecordManager recordManager;
 
     void Awake()
     {
@@ -18,25 +17,16 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        if (recordManager == null)
-        {
-            recordManager = RecordManager.Instance;
-        }
     }
-
 
     void Start()
     {
-        if (recordManager == null)
-        {
-            Debug.LogError("RecordManager 인스턴스가 존재하지 않습니다! 반드시 로비 씬에 배치해야 합니다.");
-            return;
-        }
+        logicManager.SetDependencies(uiManager, networkManager);
+        logicManager.Initialize();
 
-        recordManager.Initialize();
-        uiManager?.Initialize();
-        logicManager?.Initialize();
-        networkManager?.Initialize();
+        uiManager.SetLogicManager(logicManager);
+        uiManager.Initialize();
+
+        networkManager.Initialize();
     }
 }

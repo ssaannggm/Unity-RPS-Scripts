@@ -5,8 +5,22 @@ public class LogicManager : MonoBehaviour
     private string myChoice = "";
     private string opponentChoice = "";
 
+    private int winCount = 0;
+    private int loseCount = 0;
+
+    private UIManager ui;
+    private NetworkManager net;
+
+    public void SetDependencies(UIManager ui, NetworkManager net)
+    {
+        this.ui = ui;
+        this.net = net;
+    }
+
     public void Initialize()
     {
+        winCount = 0;
+        loseCount = 0;
         ResetChoices();
     }
 
@@ -15,10 +29,8 @@ public class LogicManager : MonoBehaviour
         if (!string.IsNullOrEmpty(myChoice)) return;
 
         myChoice = choice;
-
-        GameManager.Instance.uiManager.UpdateButtonState(choice);
-        GameManager.Instance.networkManager.SendChoiceToOpponent(choice);
-
+        ui.UpdateButtonState(choice);
+        net.SendChoiceToOpponent(choice);
         TryCheckResult();
     }
 
@@ -28,26 +40,39 @@ public class LogicManager : MonoBehaviour
         TryCheckResult();
     }
 
-    public void ResetChoices()
-    {
-        myChoice = "";
-        opponentChoice = "";
-        GameManager.Instance.uiManager.ResetUI();
-    }
-
     private void TryCheckResult()
     {
         if (string.IsNullOrEmpty(myChoice) || string.IsNullOrEmpty(opponentChoice))
             return;
 
-        var result = GetMatchResult();
+        string result = GetMatchResult();
 
-        GameManager.Instance.uiManager.SetResultText(result);
-        GameManager.Instance.recordManager.AddResult(result);
-        GameManager.Instance.uiManager.SetWinLoseText(
-            GameManager.Instance.recordManager.GetWinCount(),
-            GameManager.Instance.recordManager.GetLoseCount()
-        );
+        if (result == "승리!")
+            winCount++;
+        else if (result == "패배...")
+            loseCount++;
+
+        // 결과 계산한 쪽만 결과 출력 + 리셋 버튼 표시
+        ui.SetResultText(result, true);
+        ui.SetWinLoseText(winCount, loseCount);
+    }
+
+    public void RequestReset()
+    {
+        ResetChoices();
+        net.SendResetSignal(); // 상대도 강제 리셋됨
+    }
+
+    public void ReceiveResetRequestFromOpponent()
+    {
+        ResetChoices(); // 강제 리셋
+    }
+
+    private void ResetChoices()
+    {
+        myChoice = "";
+        opponentChoice = "";
+        ui.ResetUI();
     }
 
     private string GetMatchResult()
