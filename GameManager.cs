@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        recordManager.Initialize(reset: true);
+        recordManager.Initialize();
         uiManager.Initialize();
         logicManager.Initialize();
         networkManager.Initialize();

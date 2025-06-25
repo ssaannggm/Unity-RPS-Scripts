@@ -3,11 +3,11 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
     public TMP_Text statusText;
-
     public TMP_InputField nicknameInput;
 
     void Start()
@@ -24,17 +24,38 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public void OnClick_StartGame()
     {
-        //  닉네임 설정 추가
         string inputName = nicknameInput.text.Trim();
+
         if (string.IsNullOrEmpty(inputName))
         {
             statusText.text = "닉네임을 입력해주세요!";
-            return; //  입력 없으면 게임 시작 막기
+            return;
         }
+
         PhotonNetwork.NickName = inputName;
 
+        // 닉네임에 교사 포함 시: 교사용 씬 로드
+        string lowerName = inputName.ToLower();
+        if (lowerName.Contains("teacher") || lowerName.Contains("교사"))
+        {
+            statusText.text = "교사용 모드로 진입 중...";
+            PhotonNetwork.Disconnect(); // 포톤 연결 해제 후
+            StartCoroutine(LoadTeacherSceneAfterDisconnect());
+            return;
+        }
+
+        // 일반 플레이어는 기존 방식대로 룸 입장
         statusText.text = "룸 입장 시도 중...";
         PhotonNetwork.JoinRandomRoom();
+    }
+
+    private System.Collections.IEnumerator LoadTeacherSceneAfterDisconnect()
+    {
+        // 포톤 연결이 끊길 때까지 대기
+        while (PhotonNetwork.IsConnected)
+            yield return null;
+
+        SceneManager.LoadScene("TeacherScene");
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -60,4 +81,3 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
     }
 }
-

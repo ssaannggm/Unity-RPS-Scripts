@@ -15,16 +15,17 @@ public class LogicManager : MonoBehaviour
         if (!string.IsNullOrEmpty(myChoice)) return;
 
         myChoice = choice;
-        GameManager.Instance.networkManager.SendChoiceToOpponent(choice);
-        CheckResult();
 
         GameManager.Instance.uiManager.UpdateButtonState(choice);
+        GameManager.Instance.networkManager.SendChoiceToOpponent(choice);
+
+        TryCheckResult();
     }
 
     public void SetOpponentChoice(string choice)
     {
         opponentChoice = choice;
-        CheckResult();
+        TryCheckResult();
     }
 
     public void ResetChoices()
@@ -34,30 +35,31 @@ public class LogicManager : MonoBehaviour
         GameManager.Instance.uiManager.ResetUI();
     }
 
-    void CheckResult()
+    private void TryCheckResult()
     {
-        if (string.IsNullOrEmpty(myChoice) || string.IsNullOrEmpty(opponentChoice)) return;
+        if (string.IsNullOrEmpty(myChoice) || string.IsNullOrEmpty(opponentChoice))
+            return;
 
-        string result = "";
-        if (myChoice == opponentChoice)
-            result = "무승부!";
-        else if ((myChoice == "가위" && opponentChoice == "보") ||
-                 (myChoice == "바위" && opponentChoice == "가위") ||
-                 (myChoice == "보" && opponentChoice == "바위"))
-        {
-            result = "승리!";
-            GameManager.Instance.recordManager.AddWin();
-        }
-        else
-        {
-            result = "패배...";
-            GameManager.Instance.recordManager.AddLose();
-        }
+        var result = GetMatchResult();
 
         GameManager.Instance.uiManager.SetResultText(result);
+        GameManager.Instance.recordManager.AddResult(result);
         GameManager.Instance.uiManager.SetWinLoseText(
             GameManager.Instance.recordManager.GetWinCount(),
             GameManager.Instance.recordManager.GetLoseCount()
         );
+    }
+
+    private string GetMatchResult()
+    {
+        if (myChoice == opponentChoice)
+            return "무승부!";
+
+        if ((myChoice == "가위" && opponentChoice == "보") ||
+            (myChoice == "바위" && opponentChoice == "가위") ||
+            (myChoice == "보" && opponentChoice == "바위"))
+            return "승리!";
+
+        return "패배...";
     }
 }
