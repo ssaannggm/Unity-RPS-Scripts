@@ -1,0 +1,81 @@
+# 🎮 Unity RPS Multiplayer (수업용 가위바위보 템플릿)
+
+**Unity 6 기반의 수업용 멀티플레이 보드게임 템플릿**입니다.  
+이 프로젝트는 학생용 가위바위보 게임과 교사용 전적 확인 기능을 포함한 교육용 목적으로 설계되었습니다.
+
+---
+
+## 📌 주요 기능
+
+- 실시간 멀티플레이 가위바위보 (Photon PUN 2)
+- 승패 전적 기록 및 관리
+- 교사용 전적 확인 기능 (티쳐 모드)
+- WebGL 및 모바일(iOS 기준 500MB 이하) 경량 빌드
+- DOTween Pro 기반 애니메이션
+- Easy Save (향후 제거 예정)
+
+---
+
+## 🧱 프로젝트 구조
+
+### 🔹 씬 구성 및 매니저
+
+| 씬 이름     | 매니저 구성 |
+|------------|--------------|
+| **로비 씬** | `LobbyManager` |
+| **티쳐 씬** | `TeacherManager` |
+| **게임 씬** | `GameManager`, `UIManager`, `LogicManager`, `NetworkManager`, `RecordManager` |
+
+---
+
+## 🛠️ 사용 기술 및 버전
+
+- **Unity**: 6.0.27f1
+- **Photon PUN 2**: 멀티플레이 네트워킹
+- **DOTween Pro**: UI 전환 및 애니메이션
+- **Easy Save**: 데이터 저장/불러오기 (※ 추후 제거 예정)
+- **Auto Letterbox**: 다양한 해상도 대응
+
+---
+
+## 📦 빌드 환경
+
+- **플랫폼**: WebGL, iOS, Android
+- **목표 용량**: iOS 기준 전체 빌드 500MB 이하
+- **WebGL 최적화**: 리소스 최소화, 텍스처 압축 등 진행 중
+
+---
+
+## 🎯 프로젝트 목표
+
+### 👨‍🎓 학생용
+- 멀티플레이 가위바위보 플레이
+- 간결하고 직관적인 UI
+
+### 👩‍🏫 교사용 (티쳐 모드)
+- 학생별 승패 전적 확인
+- 전적 로그 CSV 저장 기능 (개발 예정)
+
+---
+
+## 🚧 향후 계획
+
+- Easy Save 제거 → 메모리 기반 전적 기록 시스템 도입
+- `RecordManager` → CSV 내보내기 기능 구현 (WebGL 대응)
+- 템플릿화: 인터페이스 및 구조 분리로 다양한 게임 확장
+- `ScriptableObject` 기반 룰 커스터마이징
+
+---
+
+## 🔗 관련 리소스
+
+- Photon PUN 2: [https://www.photonengine.com/pun](https://www.photonengine.com/pun)
+- DOTween Pro: [http://dotween.demigiant.com/](http://dotween.demigiant.com/)
+- Easy Save: [https://assetstore.unity.com/packages/tools/input-management/easy-save-the-complete-save-load-asset-768](https://assetstore.unity.com/packages/tools/input-management/easy-save-the-complete-save-load-asset-768)
+
+---
+
+## 📄 라이선스
+
+> 교육용 목적으로만 사용 가능합니다.  
+> 무단 상업적 이용 금지. 저작권은 원 저작자에게 귀속됩니다.
