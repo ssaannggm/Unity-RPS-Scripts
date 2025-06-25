@@ -17,14 +17,26 @@ public class TeacherManager : MonoBehaviour
 
     void Start()
     {
+        Debug.Log($"IsTeacher: {IsTeacher()}");
         teacherPanel.SetActive(IsTeacher());
 
         if (IsTeacher())
         {
+            Debug.Log("Teacher mode 시작");
+            var recordManager = RecordManager.Instance;
+            Debug.Log("RecordManager.Instance: " + (recordManager == null ? "NULL" : "NOT NULL"));
+
+            if (recordManager != null)
+            {
+                var allData = recordManager.GetAllRecords();
+                Debug.Log($"총 플레이어 기록 수: {allData.Count}");
+            }
+
             exportButton.onClick.AddListener(ExportToCSV);
             LoadAllPlayerRecords();
         }
     }
+
 
     bool IsTeacher()
     {
@@ -43,26 +55,25 @@ public class TeacherManager : MonoBehaviour
 
     public void LoadAllPlayerRecords()
     {
-        if (GameManager.Instance == null || GameManager.Instance.recordManager == null)
+        var recordManager = RecordManager.Instance;
+        if (recordManager == null)
         {
-            Debug.LogWarning("GameManager 또는 RecordManager가 할당되어 있지 않습니다.");
+            Debug.LogWarning("RecordManager 인스턴스를 찾을 수 없습니다.");
             return;
         }
 
-        var allData = GameManager.Instance.recordManager.GetAllRecords();
+        var allData = recordManager.GetAllRecords();
 
         if (allData == null || allData.Count == 0)
         {
             Debug.Log("기록된 플레이어 데이터가 없습니다.");
-            // UI 초기화 또는 '데이터 없음' 메시지 띄우기 등 처리 가능
+            ClearPlayerRecordsUI();
             return;
         }
 
-        foreach (Transform child in contentParent)
-            Destroy(child.gameObject);
+        ClearPlayerRecordsUI();
 
         playerRecords.Clear();
-
 
         foreach (var kvp in allData)
         {
@@ -76,13 +87,22 @@ public class TeacherManager : MonoBehaviour
             GameObject entry = Instantiate(playerEntryPrefab, contentParent);
             record.uiObject = entry;
 
-            entry.GetComponentInChildren<TMP_Text>().text =
-                $"{record.nickname} - 승: {record.win} / 패: {record.lose}";
+            var textComponent = entry.GetComponentInChildren<TMP_Text>();
+            if (textComponent != null)
+                textComponent.text = $"{record.nickname} - 승: {record.win} / 패: {record.lose}";
 
             playerRecords.Add(record);
         }
 
         SortAndAnimate();
+    }
+
+    void ClearPlayerRecordsUI()
+    {
+        foreach (Transform child in contentParent)
+        {
+            Destroy(child.gameObject);
+        }
     }
 
     void SortAndAnimate()
@@ -101,8 +121,15 @@ public class TeacherManager : MonoBehaviour
 
     public void ExportToCSV()
     {
+        var recordManager = RecordManager.Instance;
+        if (recordManager == null)
+        {
+            Debug.LogWarning("RecordManager 인스턴스를 찾을 수 없습니다.");
+            return;
+        }
+
+        var allData = recordManager.GetAllRecords();
         var path = Path.Combine(Application.persistentDataPath, "student_records.csv");
-        var allData = GameManager.Instance.recordManager.GetAllRecords();
 
         using (StreamWriter writer = new StreamWriter(path))
         {
@@ -113,12 +140,19 @@ public class TeacherManager : MonoBehaviour
             }
         }
 
-        Debug.Log("CSV 저장 완료: " + path);
+        Debug.Log($"CSV 저장 완료: {path}");
     }
 
     public void OnClick_ResetAllRecords()
     {
-        GameManager.Instance.recordManager.ResetAllRecords();
+        var recordManager = RecordManager.Instance;
+        if (recordManager == null)
+        {
+            Debug.LogWarning("RecordManager 인스턴스를 찾을 수 없습니다.");
+            return;
+        }
+
+        recordManager.ResetAllRecords();
         LoadAllPlayerRecords();
     }
 }

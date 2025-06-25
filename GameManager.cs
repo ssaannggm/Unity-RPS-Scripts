@@ -12,16 +12,31 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         if (Instance != null && Instance != this)
+        {
             Destroy(gameObject);
-        else
-            Instance = this;
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        if (recordManager == null)
+        {
+            recordManager = RecordManager.Instance;
+        }
     }
+
 
     void Start()
     {
+        if (recordManager == null)
+        {
+            Debug.LogError("RecordManager 인스턴스가 존재하지 않습니다! 반드시 로비 씬에 배치해야 합니다.");
+            return;
+        }
+
         recordManager.Initialize();
-        uiManager.Initialize();
-        logicManager.Initialize();
-        networkManager.Initialize();
+        uiManager?.Initialize();
+        logicManager?.Initialize();
+        networkManager?.Initialize();
     }
 }
